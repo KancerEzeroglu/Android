@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">MyApplication_Android2</string>
+    <string name="myText_Hint">Buraya yazın</string>
+    <string name="btnOK_Text">Tamam</string>
+</resources>
