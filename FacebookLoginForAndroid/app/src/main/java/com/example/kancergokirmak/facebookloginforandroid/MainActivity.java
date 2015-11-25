@@ -71,11 +71,14 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        //kullanici logout olduktan sonra mesajlasma ekranini gormesini engellemek
+        //icin kullanildi.
         profileTracker = new ProfileTracker() {
             @Override
             protected void onCurrentProfileChanged(Profile oldProfile, Profile currentProfile) {
                 if(currentProfile == null){
-                    send_mes_lay.removeAllViews();
+                    send_mes_lay = (LinearLayout)findViewById(R.id.send_mes_layout_main);
+                    send_mes_lay.removeViews(0,5); // sadece login butonu gorunuyor bu sayede
                 }
             }
         };

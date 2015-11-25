@@ -39,6 +39,7 @@
         android:id="@+id/info"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
+        android:hint="..."
         />
 
     <com.facebook.login.widget.LoginButton
