@@ -3,46 +3,64 @@ package com.example.kancergokirmak.facebookloginforandroid;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.FacebookSdk;
 import com.facebook.Profile;
 import com.facebook.ProfileTracker;
+import com.facebook.login.LoginResult;
+import com.facebook.login.widget.LoginButton;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
 
+import java.io.Serializable;
+
 /**
  * Created by kancergokirmak on 02/12/15.
  */
-public class RegisterActivity extends Activity {
+public class RegisterActivity extends AppCompatActivity {
 
     private Button cusRegisterButton;
     private EditText userMail;
     private EditText userPass;
     private TextView reg_info;
     private TextView info2;
+    TextView loginScreen;
     private ProfileTracker profileTracker;
     LinearLayout send_mes_lay;
     Firebase FIREBASE_DB;
+    private LoginButton faceRegButton;
+    private CallbackManager callbackManager_reg;
 
     RegisterAccount reg_acc = new RegisterAccount();
 
     @Override
-    public void onCreate(Bundle savedInstanceState){
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.register);
-        cusRegisterButton = (Button) findViewById(R.id.cus_register);
-        TextView loginScreen = (TextView) findViewById(R.id.link_to_login);
-        userMail = (EditText)findViewById(R.id.reg_user_mail);
-        userPass = (EditText)findViewById(R.id.reg_user_password);
-        reg_info = (TextView) findViewById(R.id.reg_info);
+        FacebookSdk.sdkInitialize(this.getApplicationContext());
+        callbackManager_reg = CallbackManager.Factory.create();
 
+        setContentView(R.layout.register);
+
+        cusRegisterButton = (Button) findViewById(R.id.cus_register);
+        loginScreen = (TextView) findViewById(R.id.link_to_login);
+        userMail = (EditText) findViewById(R.id.reg_user_mail);
+        userPass = (EditText) findViewById(R.id.reg_user_password);
+        reg_info = (TextView) findViewById(R.id.reg_info);
+        faceRegButton = (LoginButton) findViewById(R.id.face_register_button);
+
+        //login ekraninageri donus yapmayi saglar.
         loginScreen.setOnClickListener(new View.OnClickListener() {
             public void onClick(View arg0) {
                 finish();
@@ -53,7 +71,26 @@ public class RegisterActivity extends Activity {
 
             @Override
             public void onClick(View v) {
-                reg_acc.registerAccount(RegisterActivity.this, userMail.getText().toString().trim(), userPass.getText().toString().trim(),RegisterActivity.this, reg_info);
+                //kullanicinin veritabanina kaydedilmesi icin post request yapilir.
+                reg_acc.registerAccount(RegisterActivity.this, userMail.getText().toString().trim(), userPass.getText().toString().trim(), RegisterActivity.this, reg_info);
+            }
+        });
+
+        faceRegButton.registerCallback(callbackManager_reg, new FacebookCallback<LoginResult>() {
+            @Override
+            public void onSuccess(LoginResult loginResult) {
+
+                send_message_start();
+            }
+
+            @Override
+            public void onCancel() {
+                reg_info.setText("Login attempt canceled.");
+            }
+
+            @Override
+            public void onError(FacebookException e) {
+                reg_info.setText("Login attempt failed.");
             }
         });
 
@@ -68,6 +105,11 @@ public class RegisterActivity extends Activity {
                 }
             }
         };
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        callbackManager_reg.onActivityResult(requestCode, resultCode, data);
     }
 
     protected void send_message_start() {

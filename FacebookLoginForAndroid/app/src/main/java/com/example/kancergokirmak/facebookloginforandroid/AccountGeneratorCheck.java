@@ -1,6 +1,9 @@
 package com.example.kancergokirmak.facebookloginforandroid;
 
 import android.content.Context;
+import android.content.Intent;
+import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -11,11 +14,9 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.HashMap;
@@ -30,6 +31,7 @@ public class AccountGeneratorCheck {
 
     RequestQueue queue;
     String account_post_url = "http://52.27.143.102:8080/login";
+    //String account_post_url = "http://0.0.0.0:8080/login";
     public static final String TAG = "AccountGeneratorCheck";
 
     public void checkMemberAccount(final Context currentContext, final String mail, final String password, final MainActivity act, final TextView info) {
@@ -50,7 +52,16 @@ public class AccountGeneratorCheck {
                 LoginResponse loginResponse = new LoginResponse(response);
 
                 if (loginResponse.getStatus().equals("SUCCESS")){
-                    act.send_message_start(); // 2.layout baslatilir
+
+                    Intent i = new Intent(currentContext,ListViewActivity.class);
+                    Bundle bundle = new Bundle();
+
+                    bundle.putString("get_mail",mail); //mail parametresi diger activity'e aktarilir
+                    bundle.putString("status",loginResponse.getStatus());
+
+                    i.putExtras(bundle);
+
+                    act.startActivity(i); //activity baslatilir
                 }else{
                     Toast.makeText(currentContext, "Lütfen bilgilerinizi kontrol ediniz!",Toast.LENGTH_SHORT).show();
                     info.setText("Kullanici kayitli değildir!");
@@ -99,7 +110,7 @@ public class AccountGeneratorCheck {
             protected Map<String, String> getParams() throws AuthFailureError{
                 Map<String, String> params = new HashMap<String, String>();
                 params.put("user_mail", mail);
-                params.put("user_Password", password);
+                params.put("user_password", password);
                 return super.getParams(); //params;
             }
         };

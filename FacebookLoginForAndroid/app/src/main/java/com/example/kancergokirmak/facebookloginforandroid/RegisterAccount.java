@@ -1,6 +1,8 @@
 package com.example.kancergokirmak.facebookloginforandroid;
 
 import android.content.Context;
+import android.content.Intent;
+import android.os.Bundle;
 import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -27,6 +29,7 @@ public class RegisterAccount {
 
     RequestQueue queue;
     String account_post_url = "http://52.27.143.102:8080/register";
+   // String account_post_url = "http://0.0.0.0:8080/register";
     public static final String TAG = "RegisterAccount";
 
     public void registerAccount(final Context currentContext, final String mail, final String password, final RegisterActivity act, final TextView reg_info) {
@@ -47,14 +50,33 @@ public class RegisterAccount {
                 LoginResponse loginResponse = new LoginResponse(response);
 
                 if (loginResponse.getStatus().equals("SUCCESS")){
-                    //Toast bas kullanici daha onceden kayitlidir diye ve 2.layoutu calisitir
+
                     Toast.makeText(currentContext,"Kullanici kayitlidir!",Toast.LENGTH_SHORT).show();
-                    act.send_message_start(); // 2.layout baslatilir
+
+                    Intent i = new Intent(currentContext,ListViewActivity.class);
+                    Bundle bundle = new Bundle();
+
+                    bundle.putString("get_mail",mail); //mail parametresi diger activity'e aktarilir
+                    bundle.putString("status",loginResponse.getStatus());
+
+                    i.putExtras(bundle);
+
+                    act.startActivity(i); //activity baslatilir
+
                 }else if(loginResponse.getStatus().equals("REGISTER")){
                     //Kullanici veritabaninda bulunamadigi icin veritabanina kaydedilir.
                     Toast.makeText(currentContext,"Kullanici sistemimize kaydedilmistir!",Toast.LENGTH_SHORT).show();
-                    reg_info.setText("Kullanici kaydedilmistir!");
-                    act.send_message_start();
+
+                    Intent i = new Intent(currentContext,ListViewActivity.class);
+                    Bundle bundle = new Bundle();
+
+                    bundle.putString("get_mail",mail); //mail parametresi diger activity'e aktarilir
+                    bundle.putString("status",loginResponse.getStatus());
+
+                    i.putExtras(bundle);
+
+                    act.startActivity(i); //activity baslatilir
+
                 }else{
                     Toast.makeText(currentContext, "Lütfen bilgilerinizi kontrol ediniz!", Toast.LENGTH_SHORT).show();
                 }
