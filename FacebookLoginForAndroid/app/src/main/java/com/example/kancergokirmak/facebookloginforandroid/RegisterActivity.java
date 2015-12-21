@@ -4,8 +4,12 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.text.method.HideReturnsTransformationMethod;
+import android.text.method.PasswordTransformationMethod;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -41,6 +45,7 @@ public class RegisterActivity extends AppCompatActivity {
     Firebase FIREBASE_DB;
     private LoginButton faceRegButton;
     private CallbackManager callbackManager_reg;
+    private CheckBox cbShowPwd;
 
     RegisterAccount reg_acc = new RegisterAccount();
 
@@ -59,6 +64,7 @@ public class RegisterActivity extends AppCompatActivity {
         userPass = (EditText) findViewById(R.id.reg_user_password);
         reg_info = (TextView) findViewById(R.id.reg_info);
         faceRegButton = (LoginButton) findViewById(R.id.face_register_button);
+        cbShowPwd = (CheckBox) findViewById(R.id.cbShowPwd);
 
         //login ekraninageri donus yapmayi saglar.
         loginScreen.setOnClickListener(new View.OnClickListener() {
@@ -105,6 +111,20 @@ public class RegisterActivity extends AppCompatActivity {
                 }
             }
         };
+
+        //parolayi acik/gizli girebilmek icin checkbox'i dinleyen bir listener yazdik..
+        cbShowPwd.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (!isChecked){
+                    //show password
+                    userPass.setTransformationMethod(PasswordTransformationMethod.getInstance());
+                }else{
+                    userPass.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
+                }
+
+            }
+        });
     }
 
     @Override

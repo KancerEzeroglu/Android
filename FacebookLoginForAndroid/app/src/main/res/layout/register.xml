@@ -35,8 +35,15 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/reg_user_password"
+        android:inputType="textPassword"
         android:hint="enter password"
         android:layout_gravity="center_horizontal" />
+
+    <CheckBox
+        android:id="@+id/cbShowPwd"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Show password" />
 
     <!-- Register Button -->
     <Button

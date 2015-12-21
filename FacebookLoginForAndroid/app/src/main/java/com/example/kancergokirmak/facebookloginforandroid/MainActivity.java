@@ -3,10 +3,14 @@ package com.example.kancergokirmak.facebookloginforandroid;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.text.method.HideReturnsTransformationMethod;
+import android.text.method.PasswordTransformationMethod;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -39,6 +43,7 @@ public class MainActivity extends AppCompatActivity implements Serializable {
     private CallbackManager callbackManager;
     LinearLayout send_mes_lay;
     TextView registerScreen;
+    private CheckBox cbShowPwd_main;
 
     AccountGeneratorCheck agc = new AccountGeneratorCheck(); // bu sinif icersindeki fonksiyonu cagirabilmek icin yeni bir nesne yarattik.
 
@@ -61,6 +66,7 @@ public class MainActivity extends AppCompatActivity implements Serializable {
         userMail = (EditText) findViewById(R.id.user_mail);
         userPass = (EditText) findViewById(R.id.user_password);
         registerScreen = (TextView) findViewById(R.id.link_to_register);
+        cbShowPwd_main = (CheckBox) findViewById(R.id.cbShowPwd);
 
         //login butonunu dinler
         cusLoginButton.setOnClickListener(new View.OnClickListener() { //normal login olmak isteyen biri ilgili butona tiklayinca calistirmamiz gereken fonksiyon calistiriliyor.
@@ -109,6 +115,20 @@ public class MainActivity extends AppCompatActivity implements Serializable {
                 }
             }
         };
+
+        //parolayi acik/gizli girebilmek icin checkbox'i dinleyen bir listener yazdik..
+        cbShowPwd_main.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (!isChecked){
+                    //show password
+                    userPass.setTransformationMethod(PasswordTransformationMethod.getInstance());
+                }else{
+                    userPass.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
+                }
+
+            }
+        });
 
     }
 
