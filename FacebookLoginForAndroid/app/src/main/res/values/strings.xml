@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">FacebookLoginForAndroid</string>
+    <string name="app_name">Messenger</string>
     <string name="action_settings">Settings</string>
     <string name="facebook_app_id">807370529392250</string>
     <string name="profile_me">My Profile Pic</string>

@@ -15,7 +15,7 @@
         android:layout_height="wrap_content"
         android:text="Email"
         android:textSize="18sp"
-        android:layout_gravity="center_horizontal"/>
+        android:layout_gravity="left"/>
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -29,7 +29,7 @@
         android:layout_height="wrap_content"
         android:text="Password"
         android:textSize="18sp"
-        android:layout_gravity="center_horizontal"/>
+        android:layout_gravity="left"/>
 
     <EditText
         android:layout_width="match_parent"

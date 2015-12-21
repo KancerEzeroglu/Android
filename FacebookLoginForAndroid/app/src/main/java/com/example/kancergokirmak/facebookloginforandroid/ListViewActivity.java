@@ -1,8 +1,14 @@
 package com.example.kancergokirmak.facebookloginforandroid;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.ContextMenu;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -29,6 +35,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Objects;
+
+import model.LoginResponse;
 
 /**
  * Created by kancergokirmak on 04/12/15.
@@ -49,6 +58,7 @@ public class ListViewActivity extends Activity {
     private ChatAdapter listMesAdapter;
     Button sendButton;
     int count = 0;
+    String delete_msg;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -94,6 +104,11 @@ public class ListViewActivity extends Activity {
         get_queue.add(getReqForChatUsers);
         mainListView.setAdapter(listAdapter);
 
+
+        //ContextMenu acilmasi icin asagidaki kodu yaziyoruz. Kisiye uzun sure basinca "sil" ve "Kişiyi görüntüle" secenekleri karsimiza cikacak.
+        //boylelikle listelenen kişiler ile olan konuşmaları silebiliriz.
+        registerForContextMenu(mainListView);
+
         //listedeki herhangi bir item'a tiklanildiginda asagidaki listener cevap verir.
         mainListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -102,8 +117,6 @@ public class ListViewActivity extends Activity {
                 int itemPosition = position;
                 itemValue = (String) mainListView.getItemAtPosition(position);
 
-                //clickleme yapilan isim ile olan mailler mongo'dan cekilmeli. Ve mesajlasma yapabilecegi firebase ekrani gelmeli.!!!!!!
-
                 //iki kullanicinin konusmalari mongodb'den cekiliyor.
                 get_messages_DB(); //ekrana daha onceki mesajlari yazdirmak icin kullanilir.
 
@@ -111,6 +124,79 @@ public class ListViewActivity extends Activity {
             }
         });
 
+    }
+
+    //ContextMenu icin kullanilacak fonksiyon..
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_main, menu);
+
+    }
+
+    //ContextMenu'deki herhangi bir item'a tiklanildiginda asagidaki menu otomatik olarak cagirilacak.
+    //Burada silme-görüntüleme isteklerini nodejs tarafina soyleyebilir ve gerekliyse db'de degisiklikleri yapabiliriz.
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+
+        final AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+        String user_2 = (String) mainListView.getItemAtPosition(info.position);
+
+        switch (item.getItemId()) {
+            case R.id.delete:
+
+                delete_msg = String.format("http://52.27.143.102:8080/deleteMessages?user_1=%1$s&user_2=%2$s", mail, user_2);
+
+                //alertdialog yerlestirecegiz. Boylece silmek istediginize emin misiniz diye sorabilecegiz
+                AlertDialog alertDialogBuilder = new AlertDialog.Builder(ListViewActivity.this).setTitle("Delete Message")
+                        .setMessage("Are you sure you want to delete this message?")
+                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+
+                                //delete yapmak icin nodejs'e get request yapmaliyiz
+                                final JsonObjectRequest deleteMessagesReq = new JsonObjectRequest(Request.Method.GET, delete_msg, new Response.Listener<JSONObject>() {
+                                    @Override
+                                    public void onResponse(JSONObject response) {
+                                        LoginResponse loginResponse = new LoginResponse(response);
+
+                                        if (loginResponse.getStatus().equals("DELETE_MESSAGE")) {
+
+                                            String toRemoveItem = listAdapter.getItem(info.position);
+                                            listAdapter.remove(toRemoveItem);
+                                            Toast.makeText(ListViewActivity.this, "Mesajlaşma başarılı bir şekilde silinmiştir!", Toast.LENGTH_SHORT).show();
+                                        }
+                                    }
+                                }, new Response.ErrorListener() {
+                                    @Override
+                                    public void onErrorResponse(VolleyError error) {
+                                        Log.e(TAG, "Delete işlemi sırasında hata ile karşılaşıldı!");
+                                    }
+                                });
+                                get_queue.add(deleteMessagesReq);
+
+                            }
+                        })
+                        .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+
+                            }
+                        })
+                        .setIcon(android.R.drawable.ic_dialog_alert).show();
+
+                return true;
+
+            case R.id.view_person:
+                Toast.makeText(this, "Kisiyi goruntule secenegine basildi!", Toast.LENGTH_SHORT).show();
+
+                //Kisiyi goruntulemek icin request yapilacak burada!!!!!!!!!!
+
+                return true;
+            default:
+                return super.onContextItemSelected(item);
+        }
     }
 
     protected void get_messages_DB() {
